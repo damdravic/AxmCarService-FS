@@ -1,30 +1,37 @@
 package repository.implementation;
 
 import com.example.AxmCarService.exception.ApiException;
+import domain.Role;
 import domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
+import repository.RoleRepository;
 import repository.UserRepository;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.example.AxmCarService.enumeration.RoleType.ROLE_USER;
+import static com.example.AxmCarService.query.UserQuery.*;
+
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserRepositoryImpl implements UserRepository {
-    private static final String COUNT_EMAIL_QUERY = "" ;
-    private static final String INSERT_USER_QUERY = "";
-    public final NamedParameterJdbcTemplate jdbc;
 
+    private  final NamedParameterJdbcTemplate jdbc;
+    private final RoleRepository<Role> roleRepository;
+    private final BCryptPasswordEncoder passwordEncoder;
     @Override
     public User create(User user) {
 
@@ -36,6 +43,7 @@ public class UserRepositoryImpl implements UserRepository {
             SqlParameterSource parameter = getSqlParameterSource(user);
             jdbc.update(INSERT_USER_QUERY,parameter,holder);
             user.setUserId(Objects.requireNonNull(holder.getKey()).longValue());
+            roleRepository.addRoleToUser(user.getUserId(),ROLE_USER.name());
         }catch (EmptyResultDataAccessException exception){}
         catch (Exception exception){
 
@@ -78,6 +86,12 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private SqlParameterSource getSqlParameterSource(User user) {
-        return null;
+
+        return new MapSqlParameterSource()
+                .addValue("firstName", user.getFirstName())
+                .addValue("lastName", user.getLastName())
+                .addValue("email", user.getEmail())
+                .addValue("lastName", passwordEncoder.encode(user.getLastName()));
+
     }
 }
