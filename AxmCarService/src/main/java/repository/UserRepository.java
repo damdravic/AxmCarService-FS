@@ -1,4 +1,4 @@
-package ripository;
+package repository;
 
 import domain.User;
 

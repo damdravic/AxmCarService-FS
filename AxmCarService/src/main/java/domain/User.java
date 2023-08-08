@@ -7,6 +7,7 @@ import lombok.experimental.SuperBuilder;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 
 @Data
@@ -16,9 +17,8 @@ import java.time.LocalDateTime;
 
 public class User {
 
-
+    @NotNull
     private Long userId;
-
     @NotEmpty(message = "First name cannot be empty")
     private String firstName;
     @NotEmpty(message = "LAst name cannot be empty")
