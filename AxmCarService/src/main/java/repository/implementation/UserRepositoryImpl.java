@@ -13,14 +13,17 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import repository.RoleRepository;
 import repository.UserRepository;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Objects;
+import java.util.UUID;
 
 import static com.example.AxmCarService.enumeration.RoleType.ROLE_USER;
+import static com.example.AxmCarService.enumeration.VerificationType.ACCOUNT;
 import static com.example.AxmCarService.query.UserQuery.*;
 
 
@@ -44,21 +47,25 @@ public class UserRepositoryImpl implements UserRepository {
             jdbc.update(INSERT_USER_QUERY,parameter,holder);
             user.setUserId(Objects.requireNonNull(holder.getKey()).longValue());
             roleRepository.addRoleToUser(user.getUserId(),ROLE_USER.name());
-        }catch (EmptyResultDataAccessException exception){}
+
+            //Send verification URL
+            String verificationUrl = getVerificationUrl(UUID.randomUUID().toString(), ACCOUNT.getType());
+            //SAve URL in verification table
+            jdbc.update(INSERT_ACCOUNT_VERIFICATION_URL_QUERY,Map.of("userId",user.getUserId(),"url",verificationUrl));
+            //Send email to user with verification url
+            //emailService.sendVerificationUrl(user.getFirstName(),user.getEmail(),verificationUrl,ACCOUNT.getType());
+            user.setEnabled(false);
+            user.setNotLocked(true);
+            return user;
+
+        }catch (EmptyResultDataAccessException exception){
+            throw new ApiException("No role found by name "+ ROLE_USER.name());
+        }
         catch (Exception exception){
+            throw new ApiException("AN error occurred.Please try again.");
 
         }
-
-
-
-
-
-
-
-
-        return user; //this is not correct
     }
-
 
 
     @Override
@@ -94,4 +101,11 @@ public class UserRepositoryImpl implements UserRepository {
                 .addValue("lastName", passwordEncoder.encode(user.getLastName()));
 
     }
+    private String getVerificationUrl(String key, String type) {
+
+        return ServletUriComponentsBuilder.fromCurrentContextPath().path("/user/verify" + type + "/" + key).toUriString();
+
+
+    }
+
 }
