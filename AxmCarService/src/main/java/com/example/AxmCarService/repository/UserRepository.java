@@ -1,6 +1,6 @@
-package repository;
+package com.example.AxmCarService.repository;
 
-import domain.User;
+import com.example.AxmCarService.domain.User;
 
 import java.util.Collection;
 

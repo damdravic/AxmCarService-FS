@@ -1,4 +1,4 @@
-package domain;
+package com.example.AxmCarService.domain;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.AllArgsConstructor;

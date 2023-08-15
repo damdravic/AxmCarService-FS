@@ -1,8 +1,12 @@
-package repository.implementation;
+package com.example.AxmCarService.repository.implementation;
 
 import com.example.AxmCarService.exception.ApiException;
-import domain.Role;
-import domain.User;
+import com.example.AxmCarService.domain.Role;
+import com.example.AxmCarService.domain.User;
+import com.example.AxmCarService.repository.RoleRepository;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -12,9 +16,9 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
+import com.example.AxmCarService.repository.UserRepository;
 import org.springframework.stereotype.Repository;
-import repository.RoleRepository;
-import repository.UserRepository;
 
 import java.util.Collection;
 import java.util.Map;
@@ -27,7 +31,7 @@ import static com.example.AxmCarService.query.UserQuery.*;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class UserRepositoryImpl implements UserRepository {
+public class UserRepositoryImpl implements UserRepository<User> {
 
     private  final NamedParameterJdbcTemplate jdbc;
     private final RoleRepository<Role> roleRepository;
@@ -91,7 +95,7 @@ public class UserRepositoryImpl implements UserRepository {
                 .addValue("firstName", user.getFirstName())
                 .addValue("lastName", user.getLastName())
                 .addValue("email", user.getEmail())
-                .addValue("lastName", passwordEncoder.encode(user.getLastName()));
+                .addValue("password", passwordEncoder.encode(user.getLastName()));
 
     }
 }

@@ -1,12 +1,12 @@
 USE axm_car_service;
-DROP TABLE IF EXISTS two_factor_verification;
-DROP TABLE IF EXISTS reset_pass_verifications;
-DROP TABLE IF EXISTS account_verifications;
-DROP TABLE IF EXISTS user_events;
-DROP TABLE IF EXISTS events;
-DROP TABLE IF EXISTS user_roles;
-DROP TABLE IF EXISTS roles;
-DROP TABLE IF EXISTS users;
+--DROP TABLE IF EXISTS two_factor_verification;
+--DROP TABLE IF EXISTS reset_pass_verifications;
+--DROP TABLE IF EXISTS account_verifications;
+--DROP TABLE IF EXISTS user_events;
+--DROP TABLE IF EXISTS events;
+--DROP TABLE IF EXISTS user_roles;
+--DROP TABLE IF EXISTS roles;
+--DROP TABLE IF EXISTS users;
 
 CREATE TABLE users(
 user_id BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT PRIMARY KEY,
