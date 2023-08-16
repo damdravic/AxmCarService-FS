@@ -1,6 +1,6 @@
 package com.example.AxmCarService.configuration;
 
-import com.example.AxmCarService.handler.CustomAccessDeniedHandeler;
+import com.example.AxmCarService.handler.CustomAccessDeniedHandler;
 import com.example.AxmCarService.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -21,7 +21,7 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 @Configuration
 public class SecurityConfig {
     private BCryptPasswordEncoder passwordEncoder;
-    private CustomAccessDeniedHandeler customAccessDeniedHandeler;
+    private CustomAccessDeniedHandler customAccessDeniedHandeler;
     private CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
 
     private static final String[] PUBLIC_URLS = {"/user/login/**","/user/register/**"} ;
