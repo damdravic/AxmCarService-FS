@@ -6,7 +6,6 @@ import com.example.AxmCarService.domainDTO.UserDTO;
 public interface UserService {
 
     public UserDTO createUser(User user);
-
-
+      public UserDTO getUserByEmail(String email);
 
 }

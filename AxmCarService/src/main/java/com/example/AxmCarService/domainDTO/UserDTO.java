@@ -1,12 +1,16 @@
 package com.example.AxmCarService.domainDTO;
 
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.time.LocalDateTime;
 @Data
+@AllArgsConstructor
+@RequiredArgsConstructor
 public class UserDTO {
 
     private Long userId;

@@ -1,16 +1,31 @@
 package com.example.AxmCarService.repository.implementation;
 
 import com.example.AxmCarService.domain.Role;
+import com.example.AxmCarService.exception.ApiException;
 import com.example.AxmCarService.repository.RoleRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.DataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
+import com.example.AxmCarService.rowmapper.RoleRowMapper;
 
 import java.util.Collection;
+import java.util.Map;
+
+import static com.example.AxmCarService.query.RoleQuery.INSERT_ROLE_TO_USER_QUERY;
+import static com.example.AxmCarService.query.RoleQuery.SELECT_ROLE_BY_NAME_QUERY;
+
 
 @Repository
-@AllArgsConstructor
-
+@RequiredArgsConstructor
+@Slf4j
 public class RoleRepositoryImpl implements RoleRepository {
+
+
+    private final NamedParameterJdbcTemplate jdbc;
+
     @Override
     public Role create(Role data) {
         return null;
@@ -38,6 +53,30 @@ public class RoleRepositoryImpl implements RoleRepository {
 
     @Override
     public void addRoleToUser(Long userId, String roleName) {
+        try{
+            Role role = jdbc.queryForObject(SELECT_ROLE_BY_NAME_QUERY,Map.of("roleName",roleName),new RoleRowMapper());
+            jdbc.update(INSERT_ROLE_TO_USER_QUERY,Map.of("userId",userId,"roleId",role.getRoleId()));
+
+
+        }catch(EmptyResultDataAccessException exception){
+            throw new ApiException("   Role not exist");
+        }catch ( DataAccessException exception){
+            throw new ApiException(" DataAccessException");
+        }
 
     }
-}
+
+    @Override
+    public Role getRoleByUserId(Long userId) {
+        return null;
+    }
+
+    @Override
+    public Role getRoleByUserEmail(String email) {
+        return null;
+    }
+
+    @Override
+    public void updateUserRole(Long userId, String roleName) {
+
+    }}

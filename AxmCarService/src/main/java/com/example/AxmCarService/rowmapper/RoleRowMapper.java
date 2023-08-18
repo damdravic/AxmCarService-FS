@@ -1,6 +1,6 @@
-package roemapper;
+package com.example.AxmCarService.rowmapper;
 
-import domain.Role;
+import com.example.AxmCarService.domain.Role;
 import org.springframework.jdbc.core.RowMapper;
 
 import java.sql.ResultSet;
@@ -10,7 +10,7 @@ public class RoleRowMapper implements RowMapper<Role> {
     @Override
     public Role mapRow(ResultSet rs, int rowNum) throws SQLException {
         return Role.builder()
-                .roleId(rs.getLong(0))
+                .roleId(rs.getLong("role_id"))
                 .roleName(rs.getString("role_name"))
                 .permission(rs.getString("permission"))
                 .build();
