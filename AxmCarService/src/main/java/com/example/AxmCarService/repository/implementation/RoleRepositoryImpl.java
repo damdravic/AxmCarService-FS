@@ -14,14 +14,16 @@ import com.example.AxmCarService.rowmapper.RoleRowMapper;
 import java.util.Collection;
 import java.util.Map;
 
-import static com.example.AxmCarService.query.RoleQuery.INSERT_ROLE_TO_USER_QUERY;
-import static com.example.AxmCarService.query.RoleQuery.SELECT_ROLE_BY_NAME_QUERY;
+import static com.example.AxmCarService.enumeration.RoleType.ROLE_USER;
+import static com.example.AxmCarService.query.RoleQuery.*;
+import static java.util.Map.*;
 
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class RoleRepositoryImpl implements RoleRepository {
+
 
 
     private final NamedParameterJdbcTemplate jdbc;
@@ -54,8 +56,8 @@ public class RoleRepositoryImpl implements RoleRepository {
     @Override
     public void addRoleToUser(Long userId, String roleName) {
         try{
-            Role role = jdbc.queryForObject(SELECT_ROLE_BY_NAME_QUERY,Map.of("roleName",roleName),new RoleRowMapper());
-            jdbc.update(INSERT_ROLE_TO_USER_QUERY,Map.of("userId",userId,"roleId",role.getRoleId()));
+            Role role = jdbc.queryForObject(SELECT_ROLE_BY_NAME_QUERY, of("roleName",roleName),new RoleRowMapper());
+            jdbc.update(INSERT_ROLE_TO_USER_QUERY, of("userId",userId,"roleId",role.getRoleId()));
 
 
         }catch(EmptyResultDataAccessException exception){
@@ -68,7 +70,15 @@ public class RoleRepositoryImpl implements RoleRepository {
 
     @Override
     public Role getRoleByUserId(Long userId) {
-        return null;
+        log.info("Fetching role for user id: {}", userId);
+        try {
+            return jdbc.queryForObject(SELECT_ROLE_BY_ID_QUERY, of("id", userId), new RoleRowMapper());
+        } catch (EmptyResultDataAccessException exception) {
+            throw new ApiException("No role found by name: " + ROLE_USER.name());
+        } catch (Exception exception) {
+            log.error(exception.getMessage());
+            throw new ApiException("An error occurred. Please try again.");
+        }
     }
 
     @Override

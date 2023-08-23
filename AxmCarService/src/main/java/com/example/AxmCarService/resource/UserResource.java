@@ -40,9 +40,9 @@ public class UserResource {
 
     @PostMapping("/login")
     public ResponseEntity<HttpResponse> login(@RequestBody @Valid @NotNull LoginForm loginForm) throws Exception{
-        log.info(" in  @PostMapping(\"/login\")");
+        log.info(" before authentication");
          authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(),loginForm.getPassword()));
-        log.info(" in  @PostMapping(\"/login\")   **2");
+        log.info(" after authentication");
         UserDTO userDTO = userService.getUserByEmail(loginForm.getEmail());
         return ResponseEntity.ok().body(
                 HttpResponse.builder()

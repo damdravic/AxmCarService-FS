@@ -112,7 +112,8 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
         }
     }
 
-    public User getUserByEmail(String email) {
+    @Override
+     public User getUserByEmail(String email) {
         try{
             log.info(" in getUserByMail");
            return jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY,Map.of("email","email"),new UserRowMapper());
