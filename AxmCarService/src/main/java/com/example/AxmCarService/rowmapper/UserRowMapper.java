@@ -20,10 +20,10 @@ public class UserRowMapper implements RowMapper<User> {
                 .title(rs.getString("title"))
                 .bio(rs.getString("bio"))
                 .imageUrl(rs.getString("image_url"))
-                .enabled(rs.getBoolean("enabled"))
+                .enabled(rs.getBoolean("enable"))
                 .isUsingMfa(rs.getBoolean("using_mfa"))
-                .isNotLocked(rs.getBoolean("not_locked"))
-                .createdAt(rs.getTimestamp("created_at").toLocalDateTime())
+                .isNotLocked(rs.getBoolean("non_locked"))
+                .createdAt(rs.getTimestamp("created_date").toLocalDateTime())
                 .build();
 
     }

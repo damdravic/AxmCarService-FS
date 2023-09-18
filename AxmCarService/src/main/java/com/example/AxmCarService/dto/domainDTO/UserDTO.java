@@ -1,4 +1,4 @@
-package com.example.AxmCarService.domainDTO;
+package com.example.AxmCarService.dto.domainDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

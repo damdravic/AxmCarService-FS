@@ -1,11 +1,13 @@
 package com.example.AxmCarService.repository.implementation;
 
 import com.example.AxmCarService.domain.UserPrincipal;
+import com.example.AxmCarService.dto.domainDTO.UserDTO;
 import com.example.AxmCarService.exception.ApiException;
 import com.example.AxmCarService.domain.Role;
 import com.example.AxmCarService.domain.User;
 import com.example.AxmCarService.repository.RoleRepository;
 import com.example.AxmCarService.rowmapper.UserRowMapper;
+import com.example.AxmCarService.utils.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
@@ -16,6 +18,7 @@ import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -24,11 +27,15 @@ import com.example.AxmCarService.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.example.AxmCarService.enumeration.RoleType.ROLE_USER;
 import static com.example.AxmCarService.query.UserQuery.*;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.time.DateFormatUtils.*;
+import static org.apache.commons.lang3.time.DateUtils.addDays;
 
 
 @Repository
@@ -36,9 +43,16 @@ import static com.example.AxmCarService.query.UserQuery.*;
 @Slf4j
 public class UserRepositoryImpl implements UserRepository<User> , UserDetailsService {
 
+    private static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
     private  final NamedParameterJdbcTemplate jdbc;
     private final RoleRepository<Role> roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
+
+    private final EmailUtils emailUtils;
+
+
+
+
     @Override
     public User create(User user) {
 
@@ -53,6 +67,7 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
             log.info("create user 1");
             roleRepository.addRoleToUser(user.getUserId(),ROLE_USER.name());
             log.info("create user 2");
+            return user;
         }catch (EmptyResultDataAccessException exception){
             throw new ApiException("EmptyResultDataAccessException");
         }
@@ -60,7 +75,7 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
             throw new ApiException("something else");
         }
 
-        return user; //this is not correct
+
     }
 
 
@@ -95,7 +110,7 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
                 .addValue("firstName", user.getFirstName())
                 .addValue("lastName", user.getLastName())
                 .addValue("email", user.getEmail())
-                .addValue("password", passwordEncoder.encode(user.getLastName()));
+                .addValue("password", passwordEncoder.encode(user.getPassword()));
 
     }
 
@@ -108,6 +123,8 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
             throw new UsernameNotFoundException("User not found in the database");
         }else {
             log.info("User found in the database:{}",user);
+           log.info(String.valueOf(roleRepository.getRoleByUserId(user.getUserId()).getPermission()));
+
             return new UserPrincipal(user,roleRepository.getRoleByUserId(user.getUserId()).getPermission());
         }
     }
@@ -115,8 +132,8 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
     @Override
      public User getUserByEmail(String email) {
         try{
-            log.info(" in getUserByMail");
-           return jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY,Map.of("email","email"),new UserRowMapper());
+
+           return jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY,Map.of("email",email),new UserRowMapper());
         }catch(EmptyResultDataAccessException exception){
             throw new ApiException("No User found by email: " + email);
 
@@ -124,6 +141,30 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
             throw new ApiException("DataAccessException.");
         }catch(Exception exception){
             throw new ApiException("... exc ...");
+        }
+
+    }
+
+    @Override
+    public void sendVerificationCode(UserDTO user) {
+        String expirationDate = format(addDays(new Date(),1),DATE_FORMAT);
+        String verificationCode = randomAlphabetic(8).toUpperCase();
+
+
+        log.info(expirationDate);
+
+        try{
+
+            jdbc.update(DELETE_CODE_VERIFICATION_BY_USER_ID,Map.of("tfv_user_id",user.getUserId()));
+            jdbc.update(INSERT_VERIFICATION_CODE_QUERY,Map.of("tfv_user_id",user.getUserId(),"code",verificationCode,"expiration_date",expirationDate));
+            emailUtils.sendMailWithCode(verificationCode,user.getEmail());
+        }catch(EmptyResultDataAccessException exception){
+            throw new ApiException("No User found by email: ");
+
+        }catch(DataAccessException exception){
+            throw new ApiException("DataAccessException." + exception.getMessage());
+        }catch(Exception exception){
+            throw new ApiException(exception.getMessage());
         }
 
     }

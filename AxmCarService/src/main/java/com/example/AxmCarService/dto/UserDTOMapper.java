@@ -1,7 +1,7 @@
 package com.example.AxmCarService.dto;
 
 import com.example.AxmCarService.domain.User;
-import com.example.AxmCarService.domainDTO.UserDTO;
+import com.example.AxmCarService.dto.domainDTO.UserDTO;
 import lombok.Data;
 import org.springframework.beans.BeanUtils;
 @Data

@@ -72,7 +72,11 @@ public class RoleRepositoryImpl implements RoleRepository {
     public Role getRoleByUserId(Long userId) {
         log.info("Fetching role for user id: {}", userId);
         try {
-            return jdbc.queryForObject(SELECT_ROLE_BY_ID_QUERY, of("id", userId), new RoleRowMapper());
+            Role role = jdbc.queryForObject(SELECT_ROLE_BY_ID_QUERY, of("id", userId), new RoleRowMapper());
+
+
+            log.info(String.valueOf(role));
+            return role;
         } catch (EmptyResultDataAccessException exception) {
             throw new ApiException("No role found by name: " + ROLE_USER.name());
         } catch (Exception exception) {
