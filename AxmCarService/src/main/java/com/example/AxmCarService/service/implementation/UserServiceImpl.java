@@ -1,12 +1,16 @@
 package com.example.AxmCarService.service.implementation;
 
+import com.example.AxmCarService.domain.Role;
 import com.example.AxmCarService.domain.User;
 import com.example.AxmCarService.dto.domainDTO.UserDTO;
 import com.example.AxmCarService.dto.UserDTOMapper;
+import com.example.AxmCarService.repository.RoleRepository;
 import com.example.AxmCarService.repository.UserRepository;
 import com.example.AxmCarService.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import static com.example.AxmCarService.dto.UserDTOMapper.*;
 
 
 @Service
@@ -14,16 +18,19 @@ import org.springframework.stereotype.Service;
 public class UserServiceImpl implements UserService {
 
    private final UserRepository<User> userRepository;
+   private final RoleRepository<Role> roleRepository;
 
 
     @Override
     public UserDTO createUser(User user) {
-        return UserDTOMapper.fromUser(userRepository.create(user));
+
+        return mapToUserDTO(userRepository.create(user));
     }
 
     @Override
     public UserDTO getUserByEmail(String email) {
-        return UserDTOMapper.fromUser(userRepository.getUserByEmail(email));
+
+        return mapToUserDTO(userRepository.getUserByEmail(email));
     }
 
     @Override
@@ -33,4 +40,16 @@ public class UserServiceImpl implements UserService {
 
 
     }
+
+    @Override
+    public UserDTO verifyCode(String email, String code) {
+        return mapToUserDTO(userRepository.verifyCode(email,code));
+    }
+
+    private UserDTO mapToUserDTO(User user){
+        return fromUser(user,roleRepository.getRoleByUserId(user.getUserId()));
+    }
+
+
+
 }

@@ -34,7 +34,7 @@ public class TokenProvider {
     public static final String AUTHORITIES = "authorities";
     private static final long ACCESS_TOKEN_EXPIRATION_TIME = 18000000;
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 432000000;
-    @Value("${jwt.secret}")
+    @Value(value = "${jwt.secret}")
     private String secret;
 
 
@@ -87,15 +87,20 @@ public class TokenProvider {
         }
         catch(TokenExpiredException ex){
             request.setAttribute("expiredMessage",ex.getMessage());
+            throw ex;
 
         }catch (InvalidClaimException ex){
             request.setAttribute("InvalidClaim",ex.getMessage());
 
-        }catch(Exception ex){
-            throw  ex;
+            throw ex;
+        }catch(Exception exception){
+            throw exception;
 
         }
+
+
     }
+
     public List<GrantedAuthority> getAuthorities(String token){
             String[] claims = getClaimsFromToken(token);
             return stream(claims).map(SimpleGrantedAuthority::new).collect(Collectors.toList());

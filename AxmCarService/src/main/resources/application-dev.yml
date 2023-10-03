@@ -22,4 +22,6 @@ spring:
 application:
   title: AxmCarService
   version: 1.0
-
+jwt:
+  secret:
+    cevafoartecomplex

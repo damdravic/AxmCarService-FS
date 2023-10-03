@@ -24,6 +24,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.example.AxmCarService.repository.UserRepository;
+import org.springframework.security.web.server.authentication.AnonymousAuthenticationWebFilter;
 import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
@@ -168,4 +169,43 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
         }
 
     }
+
+    @Override
+    public User verifyCode(String email, String code) {
+        if(!isVerificationCodeExpired(code)) throw new ApiException("This code has expired.Please login again !!");
+        try{
+            User userByCode = jdbc.queryForObject(SELECT_USER_BY_USER_CODE_QUERY, Map.of("code",code),new UserRowMapper());
+            User userByEmail = jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY, Map.of("email",email),new UserRowMapper());
+
+            jdbc.update(DELETE_CODE,Map.of("code",code));
+            if(userByCode.getEmail().equalsIgnoreCase(userByEmail.getEmail())){
+                return userByCode;
+            } else {
+                throw  new ApiException("Code is invalid .Please try again");
+            }}
+        catch(EmptyResultDataAccessException exception){
+                throw new ApiException("Could not find record");}
+        catch(Exception e){
+   throw  new ApiException("An error is occurred.Please try again." + e.getMessage());
+            }
+
+        }
+
+    private boolean isVerificationCodeExpired(String code) {
+        try {
+            Date expDate = jdbc.queryForObject(SELECT_EXP_DATE, Map.of("code", code), Date.class);
+            if(expDate.after(new Date()))
+                return true;
+
+
+        }catch(EmptyResultDataAccessException exception){
+            throw new ApiException("Could not find record");}
+        catch(Exception e){
+            throw  new ApiException("An error is occurred.Please try again." + e.getMessage());
+        }
+
+   return false;
+    }
+
 }
+
