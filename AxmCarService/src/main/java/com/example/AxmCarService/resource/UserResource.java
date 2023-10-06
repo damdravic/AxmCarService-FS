@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -51,10 +52,6 @@ public class UserResource {
 
         return user.isUsingMfa()?  sendVerificationCode(user) :  sendResponse(user);
 
-
-
-
-
     }
 
 
@@ -69,6 +66,28 @@ public class UserResource {
                         .data(Map.of("user",userDTO))
                         .message("User created")
                         .developerMessage("")
+                        .build());
+    }
+
+
+
+
+
+    @GetMapping("/profile")
+    public ResponseEntity<HttpResponse> profile(Authentication authentication){
+
+        System.out.println("dddddddd");
+        UserDTO user = userService.getUserByEmail(authentication.getName());
+        System.out.println(authentication.getPrincipal());
+
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .timeStamp(now().toString())
+                        .httpStatus(OK)
+                        .statusCode(OK.value())
+                        .data(Map.of("user",user ))
+                        .message("profile Retrieved")
+                        .statusCode(OK.value())
                         .build());
     }
 
