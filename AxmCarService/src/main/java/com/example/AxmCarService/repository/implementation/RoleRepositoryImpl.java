@@ -9,10 +9,9 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
-import com.example.AxmCarService.rowmapper.RoleRowMapper;
+import com.example.AxmCarService.rmapper.RoleRowMapper;
 
 import java.util.Collection;
-import java.util.Map;
 
 import static com.example.AxmCarService.enumeration.RoleType.ROLE_USER;
 import static com.example.AxmCarService.query.RoleQuery.*;
@@ -68,14 +67,12 @@ public class RoleRepositoryImpl implements RoleRepository {
 
     }
 
+    int x =1;
     @Override
     public Role getRoleByUserId(Long userId) {
-        log.info("Fetching role for user id: {}", userId);
         try {
+
             Role role = jdbc.queryForObject(SELECT_ROLE_BY_ID_QUERY, of("id", userId), new RoleRowMapper());
-
-
-            log.info(String.valueOf(role));
             return role;
         } catch (EmptyResultDataAccessException exception) {
             throw new ApiException("No role found by name: " + ROLE_USER.name());

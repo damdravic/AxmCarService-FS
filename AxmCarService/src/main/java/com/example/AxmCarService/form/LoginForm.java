@@ -1,13 +1,19 @@
 package com.example.AxmCarService.form;
 
+
+import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
 
-@Data
+@Getter
+@Setter
 public class LoginForm {
-    @NotEmpty
+
+    @NotEmpty(message = "Email cannot be empty")
     private String email;
-    @NotEmpty
+
+    @NotEmpty(message = "Pass cannot be empty")
     private String password;
 }

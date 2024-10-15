@@ -6,12 +6,14 @@ import com.example.AxmCarService.exception.ApiException;
 import com.example.AxmCarService.domain.Role;
 import com.example.AxmCarService.domain.User;
 import com.example.AxmCarService.repository.RoleRepository;
-import com.example.AxmCarService.rowmapper.UserRowMapper;
+import com.example.AxmCarService.rmapper.UserRowMapper;
 import com.example.AxmCarService.utils.EmailUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataAccessException;
 import org.springframework.dao.EmptyResultDataAccessException;
+
+
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
@@ -24,8 +26,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.example.AxmCarService.repository.UserRepository;
-import org.springframework.security.web.server.authentication.AnonymousAuthenticationWebFilter;
 import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Date;
@@ -40,9 +42,10 @@ import static org.apache.commons.lang3.time.DateUtils.addDays;
 
 
 @Repository
+@Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserRepositoryImpl implements UserRepository<User> , UserDetailsService {
+public class UserRepositoryImpl implements UserRepository<User> ,UserDetailsService {
 
     private static final String DATE_FORMAT = "yyyy-MM-dd hh:mm:ss";
     private  final NamedParameterJdbcTemplate jdbc;
@@ -123,23 +126,22 @@ public class UserRepositoryImpl implements UserRepository<User> , UserDetailsSer
             log.error("User not found in the database");
             throw new UsernameNotFoundException("User not found in the database");
         }else {
-            log.info("User found in the database:{}",user);
-           log.info(String.valueOf(roleRepository.getRoleByUserId(user.getUserId()).getPermission()));
 
-            return new UserPrincipal(user,roleRepository.getRoleByUserId(user.getUserId()).getPermission());
+            Role role = roleRepository.getRoleByUserId((user.getUserId()));
+            String permission = role.getPermission();
+            return new UserPrincipal(user,permission);
         }
     }
 
     @Override
      public User getUserByEmail(String email) {
         try{
-
            return jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY,Map.of("email",email),new UserRowMapper());
         }catch(EmptyResultDataAccessException exception){
             throw new ApiException("No User found by email: " + email);
 
         }catch(DataAccessException exception){
-            throw new ApiException("DataAccessException.");
+            throw new ApiException( "DataAccessException.");
         }catch(Exception exception){
             throw new ApiException("... exc ...");
         }

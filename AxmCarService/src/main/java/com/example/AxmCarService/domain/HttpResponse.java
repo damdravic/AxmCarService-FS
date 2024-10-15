@@ -20,4 +20,5 @@ public class HttpResponse {
     protected String developerMessage;
     protected Map<?,?>  data;
 
+
 }

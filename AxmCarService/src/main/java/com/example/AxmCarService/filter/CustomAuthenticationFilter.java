@@ -1,6 +1,7 @@
 package com.example.AxmCarService.filter;
 
 import com.example.AxmCarService.provider.TokenProvider;
+import com.example.AxmCarService.utils.ExceptionUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -18,6 +19,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
+import static com.example.AxmCarService.utils.ExceptionUtils.processError;
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
 
@@ -30,7 +32,7 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 public class CustomAuthenticationFilter extends OncePerRequestFilter {
 
     private static final String TOKEN_PREFIX = "Bearer ";
-    private static final String[] PUBLIC_ROUTES = {"/user/register","/user/login","/user/verify/code"};
+    private static final String[] PUBLIC_ROUTES = {"/user/register","/user/login","/user/verify/code","/user/refresh/token"};
     private static final String HTTP_OPTIONS_METHOD = "OPTIONS";
     private final TokenProvider tokenProvider;
     protected  static final String TOKEN_KEY = "token";
@@ -43,6 +45,10 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
         try{
             Map<String ,String> values = getRequestValues(request);
             String token = getToken(request);
+            log.info("URL Request", request.getRequestURI());
+            log.info("Token: {}",token);
+            log.info(" token valid " +  Boolean.toString(tokenProvider.isTokenValid(values.get(EMAIL_KEY),token)));
+
             if(tokenProvider.isTokenValid(values.get(EMAIL_KEY),token)){
                 List<GrantedAuthority> authorities = tokenProvider.getAuthorities(values.get(TOKEN_KEY));
                 Authentication authentication = tokenProvider.getAuthentication(values.get(EMAIL_KEY),authorities,request);
@@ -54,7 +60,7 @@ public class CustomAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request,response);
         }catch(Exception exception){
                   log.error(exception.getMessage());
-                 // processError(request,response,exception);
+                  processError(request,response,exception);
         }
 
     }

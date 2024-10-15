@@ -1,4 +1,4 @@
-package com.example.AxmCarService.rowmapper;
+package com.example.AxmCarService.rmapper;
 
 import com.example.AxmCarService.domain.User;
 import org.springframework.jdbc.core.RowMapper;

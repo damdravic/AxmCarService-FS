@@ -1,6 +1,7 @@
 package com.example.AxmCarService.configuration;
 
 import com.example.AxmCarService.filter.CustomAuthenticationFilter;
+
 import com.example.AxmCarService.handler.CustomAccessDeniedHandler;
 import com.example.AxmCarService.handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,13 +36,13 @@ public class SecurityConfig {
     private final  UserDetailsService userDetailsService;
     private final CustomAuthenticationFilter customAuthenticationFilter;
 
-    private static final String[] PUBLIC_URLS = {"/user/register/**","/user/login/**","/user/verify/code/**"} ;
+    private static final String[] PUBLIC_URLS = {"/user/register/**","/user/login/**","/user/verify/code/**","/user/refresh/token/**"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws  Exception{
 
         http.csrf(AbstractHttpConfigurer::disable);
-        http.cors(AbstractHttpConfigurer::disable);
+        http.cors(Customizer.withDefaults());
 
         http.sessionManagement(session -> session.sessionCreationPolicy(STATELESS));
         http.authorizeHttpRequests(ar-> ar.requestMatchers(PUBLIC_URLS).permitAll());
@@ -59,6 +61,7 @@ public class SecurityConfig {
         DaoAuthenticationProvider daoAuthenticationProvider = new DaoAuthenticationProvider();
         daoAuthenticationProvider.setUserDetailsService(userDetailsService);
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
+
                 return new ProviderManager(daoAuthenticationProvider);
     }
 

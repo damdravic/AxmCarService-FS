@@ -2,8 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/AxmCarService/AxmCarService.iml" filepath="$PROJECT_DIR$/AxmCarService/AxmCarService.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/AxmCarService FullStack.iml" filepath="$PROJECT_DIR$/.idea/AxmCarService FullStack.iml" />
+      <module fileurl="file://$PROJECT_DIR$/AxmCarService/AnaximStore.iml" filepath="$PROJECT_DIR$/AxmCarService/AnaximStore.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/AnaximStore FullStack.iml" filepath="$PROJECT_DIR$/.idea/AnaximStore FullStack.iml" />
     </modules>
   </component>
 </project>

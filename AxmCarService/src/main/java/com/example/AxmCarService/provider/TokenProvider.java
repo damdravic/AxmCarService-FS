@@ -32,8 +32,8 @@ import static java.util.Arrays.stream;
 public class TokenProvider {
 
     public static final String AUTHORITIES = "authorities";
-    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 18000000;
-    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 432000000;
+    private static final long ACCESS_TOKEN_EXPIRATION_TIME = 300_000_000;
+    private static final long REFRESH_TOKEN_EXPIRATION_TIME = 432_000_000;
     @Value(value = "${jwt.secret}")
     private String secret;
 
@@ -42,7 +42,7 @@ public class TokenProvider {
         String[] claims = getClaimsFromUser(userPrincipal);
         return JWT.create().withIssuer("ANAXIM").withAudience(" ")
                 .withIssuedAt(new Date()).withSubject(userPrincipal.getUsername())
-                .withArrayClaim(AUTHORITIES,claims).withExpiresAt(new Date(currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
+                .withArrayClaim(AUTHORITIES,claims).withExpiresAt(new Date(currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .sign(HMAC512(secret.getBytes()));
         
     }
@@ -50,9 +50,10 @@ public class TokenProvider {
 
     public String createRefreshToken(UserPrincipal userPrincipal){
         String[] claims = getClaimsFromUser(userPrincipal);
+
         return JWT.create().withIssuer("ANAXIM").withAudience(" ")
                 .withIssuedAt(new Date()).withSubject(userPrincipal.getUsername())
-                .withExpiresAt(new Date(currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
+                .withExpiresAt(new Date(currentTimeMillis() + REFRESH_TOKEN_EXPIRATION_TIME))
                 .sign(HMAC512(secret.getBytes()));
 
     }

@@ -9,6 +9,9 @@ import com.example.AxmCarService.form.LoginForm;
 import com.example.AxmCarService.provider.TokenProvider;
 import com.example.AxmCarService.service.RoleService;
 import com.example.AxmCarService.service.UserService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -17,17 +20,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
+import java.io.File;
 import java.net.URI;
 import java.util.Map;
 
 import static com.example.AxmCarService.dto.UserDTOMapper.toUser;
 import static java.time.LocalDateTime.now;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.*;
 
 @Data
@@ -37,21 +41,59 @@ import static org.springframework.http.HttpStatus.*;
 @Slf4j
 public class UserResource {
 
+    private static final String TOKEN_PREFIX = "Bearer ";
     private final UserService userService;
     private final AuthenticationManager authenticationManager;
    private final RoleService roleService;
     private TokenProvider tokenProvider;
 
 
-    @PostMapping("/login")
-    public ResponseEntity<HttpResponse> login(@RequestBody @Valid @NotNull LoginForm loginForm) throws Exception{
+    @PostMapping("/login" )
+    public ResponseEntity<HttpResponse> login(@RequestBody @Valid  LoginForm loginForm) {
 
          authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginForm.getEmail(),loginForm.getPassword()));
-
         UserDTO user = userService.getUserByEmail(loginForm.getEmail());
 
         return user.isUsingMfa()?  sendVerificationCode(user) :  sendResponse(user);
 
+
+    }
+    @GetMapping("/refresh/token")
+    public ResponseEntity<HttpResponse> refreshToken(HttpServletRequest request){
+        log.info("in refresh token");
+        if(isHeaderAndTokenValid(request)){
+            log.info("in refresh token step 2");
+            String token = request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length());
+            UserDTO user = userService.getUserByEmail(tokenProvider.getSubject(token,request));
+            return ResponseEntity.ok().body(
+                    HttpResponse.builder()
+                            .timeStamp(now().toString())
+                            .httpStatus(OK)
+                            .statusCode(OK.value())
+                            .data(Map.of("user",user,
+                                    "accessToken",tokenProvider.createAccessToken(getUserPrincipal(user)),
+                                    "refreshToken", tokenProvider.createRefreshToken(getUserPrincipal(user))))
+                            .message("Token Refreshed")
+                            .developerMessage("")
+                            .build());
+        }
+        return ResponseEntity.badRequest().body(
+                HttpResponse.builder()
+                        .timeStamp(now().toString())
+                        .httpStatus(OK)
+                        .statusCode(OK.value())
+                        .reason("Refresh Token missing or invalid")
+                        .message("Token Refreshed")
+                        .developerMessage("Refresh Token missing or invalid")
+                        .build());
+
+    }
+
+    private boolean isHeaderAndTokenValid(HttpServletRequest request) {
+        log.info(request.getHeader(AUTHORIZATION));
+        return request.getHeader(AUTHORIZATION) != null && request.getHeader(AUTHORIZATION).startsWith(TOKEN_PREFIX)
+                && tokenProvider.isTokenValid(tokenProvider.getSubject(request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length()),request),
+                request.getHeader(AUTHORIZATION).substring(TOKEN_PREFIX.length()));
     }
 
 
@@ -71,12 +113,10 @@ public class UserResource {
 
 
 
-
-
     @GetMapping("/profile")
     public ResponseEntity<HttpResponse> profile(Authentication authentication){
 
-        System.out.println("dddddddd");
+
         UserDTO user = userService.getUserByEmail(authentication.getName());
         System.out.println(authentication.getPrincipal());
 
@@ -125,14 +165,16 @@ public class UserResource {
                         .timeStamp(now().toString())
                         .httpStatus(OK)
                         .statusCode(OK.value())
-                        .data(Map.of("user",user ,"access_token",tokenProvider.createAccessToken(getUserPrincipal(user)),"refreshToken",
-                                tokenProvider.createRefreshToken(getUserPrincipal(user))))
+                        .data(Map.of("user",user,
+                                        "accessToken",tokenProvider.createAccessToken(getUserPrincipal(user)),
+                                        "refreshToken", tokenProvider.createRefreshToken(getUserPrincipal(user))))
                         .message("Login Success")
                         .developerMessage("")
                         .build());
     }
 
     private UserPrincipal getUserPrincipal(UserDTO user) {
+        log.info("from method getUserPrincipal for token and refreshToken");
      return new UserPrincipal(toUser(userService.getUserByEmail(user.getEmail())),roleService.getRoleByUserId(user.getUserId()).getPermission());
 
     }
