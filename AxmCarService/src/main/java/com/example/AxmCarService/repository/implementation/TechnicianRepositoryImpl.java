@@ -34,21 +34,25 @@ public class TechnicianRepositoryImpl implements TechnicianRepository<Technician
        }catch(Exception e){
               throw new ApiException(e.getMessage() + "Error in creating technician");
        }
-       data.setTechnicianId(kh.getKey().longValue());
+
+       data.setId(kh.getKey().longValue());
        return data;
 
 
     }
 
-    private SqlParameterSource getSqlParameterSource(Technician data) {
-        return new MapSqlParameterSource()
-                .addValue("technicianId",data.getTechnicianId())
-                .addValue("technicianSpecialization ", data.getTechnicianSpecialization())
-                .addValue("technicianExperience",data.getTechnicianExperience())
-                .addValue("technicianWorkshopId",data.getTechnicianWorkshopId())
-                .addValue("technicianUserId",data.getTechnicianUserId());
+  private SqlParameterSource getSqlParameterSource(Technician data) {
+       return new MapSqlParameterSource()
+               .addValue("technicianName",data.getTechName())
+                .addValue("technicianUserId",data.getUserId())
+                .addValue("technicianActive",data.isActive())
+              .addValue("technicianWorkshop",data.getWorkshop())
+               .addValue("technicianExperience",data.getExperience())
+               .addValue("technicianSpecialization",data.getSpecialization());
 
     }
+
+
 
     @Override
     public Technician getTechnicianById(Long id) {
@@ -57,6 +61,14 @@ public class TechnicianRepositoryImpl implements TechnicianRepository<Technician
 
     @Override
     public List<Technician> getAllTechnicians() {
-        return null;
+       return jdbc.query("SELECT * FROM technician", (rs, rowNum) -> new Technician(
+                rs.getLong("technician_id"),
+                rs.getString("technician_name"),
+                rs.getLong("technician_user_id"),
+                rs.getBoolean("technician_active"),
+                rs.getString("technician_workshop"),
+                rs.getInt("technician_experience"),
+                rs.getString("technician_specialization")
+        ));
     }
 }

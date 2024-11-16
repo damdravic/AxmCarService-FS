@@ -29,10 +29,7 @@ import com.example.AxmCarService.repository.UserRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Date;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static com.example.AxmCarService.enumeration.RoleType.ROLE_USER;
 import static com.example.AxmCarService.query.UserQuery.*;
@@ -186,12 +183,27 @@ public class UserRepositoryImpl implements UserRepository<User> ,UserDetailsServ
                 throw  new ApiException("Code is invalid .Please try again");
             }}
         catch(EmptyResultDataAccessException exception){
-                throw new ApiException("Could not find record");}
+                throw new ApiException("Could not find record");
+        }
         catch(Exception e){
    throw  new ApiException("An error is occurred.Please try again." + e.getMessage());
             }
 
         }
+
+    @Override
+    public List<User> getAllUsers() {
+        try{
+
+            return jdbc.query(SELECT_ALL_USERS_QUERY,new UserRowMapper());
+
+
+        }catch(EmptyResultDataAccessException exception){
+            throw new ApiException("Could not find record");
+        }catch(Exception e){
+            throw  new ApiException("An error is occurred when try to get all users." + e.getMessage());
+        }
+    }
 
     private boolean isVerificationCodeExpired(String code) {
         try {

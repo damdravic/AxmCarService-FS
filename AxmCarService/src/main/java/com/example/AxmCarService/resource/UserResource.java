@@ -99,6 +99,7 @@ public class UserResource {
 
     @PostMapping("/register")
     public ResponseEntity<HttpResponse> saveUser(@RequestBody @Valid User user){
+        System.out.println("in saveUser" + user);
         UserDTO userDTO = userService.createUser(user);
         return ResponseEntity.created(getUri()).body(
                 HttpResponse.builder()
@@ -150,6 +151,29 @@ public class UserResource {
                         .build());
     }
 
+    @GetMapping("/all")
+    public ResponseEntity<HttpResponse> getAllUsers(){
+        System.out.println("in getAllUsers");
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .timeStamp(now().toString())
+                        .httpStatus(OK)
+                        .statusCode(OK.value())
+                        .data(Map.of("users",userService.getAllUsers()))
+                        .message("Login Success")
+                        .developerMessage("")
+                        .build());
+    }
+
+
+    /* fake data   -will be removed */
+    public static User[] getFakeUsers(){
+        User[] users = new User[3];
+        users[0] = new User(1L, "John", "Doe", "john.doe@example.com", "password123", "123 Main St", "555-1234", "Mr.", "Bio of John", "url/to/image", true, true, false, now());
+        users[1] = new User(2L, "Jane", "Smith", "jane.smith@example.com", "password456", "456 Elm St", "555-5678", "Ms.", "Bio of Jane", "url/to/image", true, true, false, now());
+        users[2] = new User(3L, "Alice", "Johnson", "alice.johnson@example.com", "password789", "789 Oak St", "555-9012", "Dr.", "Bio of Alice", "url/to/image", true, true, false, now());
+        return users;
+    }
 
     private URI getUri() {
         return URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()

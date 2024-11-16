@@ -5,9 +5,7 @@ import com.example.AxmCarService.domain.Technician;
 import com.example.AxmCarService.service.TechnicianService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -16,14 +14,28 @@ import java.util.Map;
 public class TechnicianResource {
      private final TechnicianService technicianService;
 
-    @RequestMapping("/newTechnician")
+    @PostMapping("/newTechnician")
     public ResponseEntity<HttpResponse> addTechnician(@RequestBody Technician technician) {
+        System.out.println("in add technician" + technician.getTechName() + " " + technician.getSpecialization());
         Technician newTech =  technicianService.addTechnician(technician);
         return ResponseEntity.ok().body(
           HttpResponse.builder()
                     .statusCode(200)
                     .message("Technician added successfully")
                     .data(Map.of("technician",newTech))
+                    .build());
+
+    }
+
+
+    @GetMapping("/all")
+    public ResponseEntity<HttpResponse> getAllTechnicians() {
+        System.out.println("in get all technicians");
+        return ResponseEntity.ok().body(
+          HttpResponse.builder()
+                    .statusCode(200)
+                    .message("Technicians retrieved successfully")
+                    .data(Map.of("technicians",technicianService.getAllTechnicians()))
                     .build());
 
     }

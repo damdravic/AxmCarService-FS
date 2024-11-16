@@ -72,14 +72,34 @@ CREATE TABLE IF NOT EXISTS parts(
 
 CREATE TABLE IF NOT EXISTS technician(
 technician_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-technician_specialization VARCHAR(50) NOT NULL,
-technician_experience INT UNSIGNED NOT NULL,
-technician_workshop_id BIGINT UNSIGNED NOT NULL,
+technician_name VARCHAR(50) NOT NULL,
 technician_user_id BIGINT UNSIGNED NOT NULL,
-FOREIGN KEY (technician_workshop_id) REFERENCES Workshop(workshop_id) ON DELETE CASCADE ON UPDATE CASCADE,
+technician_active BOOLEAN NOT NULL,
+technician_workshop VARCHAR(50) NOT NULL,
+technician_experience INTEGER NOT NULL,
+technician_specialization VARCHAR(50) NOT NULL,
 FOREIGN KEY (technician_user_id) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 
 );
+
+ CREATE TABLE IF NOT EXISTS customer(
+ customer_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ customer_first_name VARCHAR(50) NOT NULL,
+ customer_last_name VARCHAR(50) NOT NULL,
+    customer_email VARCHAR(50) NOT NULL,
+    customer_phone VARCHAR(30) DEFAULT NULL,
+   customer_notes VARCHAR(255) DEFAULT NULL,
+   customer_active BOOLEAN DEFAULT TRUE,
+   customer_created_date DATETIME DEFAULT CURRENT_TIMESTAMP,
+   customer_updated_date DATETIME DEFAULT NULL,
+   customer_created_by BIGINT UNSIGNED NOT NULL,
+    customer_updated_by BIGINT UNSIGNED DEFAULT NULL,
+    FOREIGN KEY (customer_created_by) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (customer_updated_by) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    );
+
+
+
 
 
 

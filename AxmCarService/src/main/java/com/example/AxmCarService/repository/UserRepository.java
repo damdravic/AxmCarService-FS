@@ -4,6 +4,7 @@ import com.example.AxmCarService.domain.User;
 import com.example.AxmCarService.dto.domainDTO.UserDTO;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface UserRepository<T extends User> {
     /* Basic CRUD operations */
@@ -20,4 +21,6 @@ public interface UserRepository<T extends User> {
     void sendVerificationCode(UserDTO user);
 
     User verifyCode(String email, String code);
+
+    List<T> getAllUsers();
 }

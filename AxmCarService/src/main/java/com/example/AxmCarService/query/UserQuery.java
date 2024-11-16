@@ -14,4 +14,5 @@ public class UserQuery {
      public static final String DELETE_CODE=" DELETE FROM two_factor_verifications WHERE code = :code ";
 
      public static final String SELECT_EXP_DATE = "SELECT expiration_date FROM two_factor_verifications WHERE code = :code ";
+     public static final String SELECT_ALL_USERS_QUERY = "SELECT * FROM users";
 }

@@ -1,5 +1,6 @@
 package com.example.AxmCarService.domain;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -12,6 +13,7 @@ import static java.util.Arrays.stream;
 import static java.util.stream.Collectors.toList;
 
 @RequiredArgsConstructor
+@Data
 public class UserPrincipal implements UserDetails {
 
 

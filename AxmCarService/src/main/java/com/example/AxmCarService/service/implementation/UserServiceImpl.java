@@ -11,6 +11,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.example.AxmCarService.dto.UserDTOMapper.*;
 
 
@@ -41,6 +44,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDTO verifyCode(String email, String code) {
         return mapToUserDTO(userRepository.verifyCode(email,code));
+    }
+
+    @Override
+    public List<UserDTO> getAllUsers() {
+        return userRepository.getAllUsers().stream().map(this :: mapToUserDTO).collect(Collectors.toList());
     }
 
     private UserDTO mapToUserDTO(User user){

@@ -13,7 +13,7 @@ public class TechnicianServiceImpl implements TechnicianService {
     private final TechnicianRepository technicianRepository;
     @Override
     public Technician addTechnician(Technician technician) {
-        return null;
+      return technicianRepository.create(technician);
     }
 
     @Override
@@ -23,7 +23,8 @@ public class TechnicianServiceImpl implements TechnicianService {
 
     @Override
     public List<Technician> getAllTechnicians() {
-        return null;
+
+        return technicianRepository.getAllTechnicians();
     }
 
     @Override
