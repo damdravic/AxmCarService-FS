@@ -47,7 +47,17 @@ public class CustomerResource {
         );
     }
 
+   @DeleteMapping("/delete/{customerId}")
+    public ResponseEntity<HttpResponse> deleteCustomer(@PathVariable Long customerId){
+       System.out.println("customerId = " + customerId);
+        customerService.deleteCustomer(customerId);
 
-
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .statusCode(200)
+                        .httpStatus(org.springframework.http.HttpStatus.OK)
+                        .message("Customer deleted successfully")
+                        .build());
+    }
 
 }

@@ -57,5 +57,9 @@ public class UserServiceImpl implements UserService {
     }
 
 
+    public UserDTO getUserById(Long id){
+        return mapToUserDTO(userRepository.getUserById(id));
+    }
+
 
 }

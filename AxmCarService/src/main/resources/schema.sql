@@ -56,9 +56,9 @@ status VARCHAR(50) NOT NULL CHECK(status IN ('Pending','Waiting Parts','In Progr
 estimated_time DATETIME DEFAULT NULL,
 estimated_cost BIGINT UNSIGNED DEFAULT NULL,
 total_cost BIGINT UNSIGNED DEFAULT NULL,
-FOREIGN KEY (workshop_id) REFERENCES Workshop(workshop_id) ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (vehicle_id) REFERENCES Vehicle(vehicle_id) ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (technician_id) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+FOREIGN KEY (workshop_id) REFERENCES workshop(workshop_id) ON DELETE SET NULL ON UPDATE CASCADE,
+FOREIGN KEY (vehicle_id) REFERENCES vehicle(vehicle_id) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (technician_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 
 );
 
@@ -78,7 +78,7 @@ technician_active BOOLEAN NOT NULL,
 technician_workshop VARCHAR(50) NOT NULL,
 technician_experience INTEGER NOT NULL,
 technician_specialization VARCHAR(50) NOT NULL,
-FOREIGN KEY (technician_user_id) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+FOREIGN KEY (technician_user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
 
 );
 
@@ -94,8 +94,8 @@ FOREIGN KEY (technician_user_id) REFERENCES Users(user_id) ON DELETE CASCADE ON 
    customer_updated_date DATETIME DEFAULT NULL,
    customer_created_by BIGINT UNSIGNED NOT NULL,
     customer_updated_by BIGINT UNSIGNED DEFAULT NULL,
-    FOREIGN KEY (customer_created_by) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (customer_updated_by) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
+    FOREIGN KEY (customer_created_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (customer_updated_by) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE
     );
 
 
@@ -115,8 +115,8 @@ CREATE TABLE IF NOT EXISTS labor(
   order_id BIGINT UNSIGNED NOT NULL,
   part_id BIGINT UNSIGNED NOT NULL,
   part_quantity INT UNSIGNED NOT NULL,
-  FOREIGN KEY (order_id) REFERENCES Repair_order(order_id) ON DELETE CASCADE ON UPDATE CASCADE,
-  FOREIGN KEY (part_id) REFERENCES Parts(part_id) ON DELETE CASCADE ON UPDATE CASCADE
+  FOREIGN KEY (order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE ON UPDATE CASCADE,
+  FOREIGN KEY (part_id) REFERENCES parts(part_id) ON DELETE CASCADE ON UPDATE CASCADE
  );
 
  CREATE TABLE IF NOT EXISTS repair_order_labor(
@@ -124,8 +124,8 @@ CREATE TABLE IF NOT EXISTS labor(
  order_id BIGINT UNSIGNED NOT NULL,
  labor_id BIGINT UNSIGNED NOT NULL,
  labor_quantity INT UNSIGNED NOT NULL,
- FOREIGN KEY (order_id) REFERENCES Repair_order(order_id) ON DELETE CASCADE ON UPDATE CASCADE,
- FOREIGN KEY (labor_id) REFERENCES Labor(labor_id) ON DELETE CASCADE ON UPDATE CASCADE
+ FOREIGN KEY (order_id) REFERENCES repair_order(order_id) ON DELETE CASCADE ON UPDATE CASCADE,
+ FOREIGN KEY (labor_id) REFERENCES labor(labor_id) ON DELETE CASCADE ON UPDATE CASCADE
  );
 
 
@@ -144,8 +144,8 @@ CREATE TABLE IF NOT EXISTS user_roles(
 ur_id    BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT PRIMARY KEY,
 ur_user_id         BIGINT UNSIGNED   NOT NULL ,
 ur_role_id         BIGINT UNSIGNED   NOT NULL ,
-FOREIGN KEY (ur_user_id) REFERENCES Users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-FOREIGN KEY (ur_role_id) REFERENCES Roles(role_id) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (ur_user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
+FOREIGN KEY (ur_role_id) REFERENCES roles(role_id) ON DELETE CASCADE ON UPDATE CASCADE,
 
 CONSTRAINT UQ_UserRoles_User_Id UNIQUE(ur_user_id)
 
@@ -183,10 +183,9 @@ CREATE TABLE IF NOT EXISTS account_verifications(
 av_id      BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT PRIMARY KEY,
 av_user_id  BIGINT UNSIGNED   NOT NULL,
 url VARCHAR(255)  DEFAULT NULL,
---date DATETIME NOT NULL,
 FOREIGN KEY (av_user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-CONSTRAINT UQ_AccountVeriffication_User_Id UNIQUE (av_user_id),
-CONSTRAINT UQ_AccountVeriffication_Url UNIQUE (url)
+CONSTRAINT UQ_AccountVerification_User_Id UNIQUE (av_user_id),
+CONSTRAINT UQ_AccountVerification_Url UNIQUE (url)
 
 );
 
@@ -196,11 +195,11 @@ CREATE TABLE IF NOT EXISTS reset_pass_verifications(
 rpv_id      BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT PRIMARY KEY,
 rpv_user_id  BIGINT UNSIGNED   NOT NULL,
 url VARCHAR(255)  DEFAULT NULL,
-expirtation_date DATETIME DEFAULT NULL,
---date DATETIME NOT NULL,
+expiration_date DATETIME DEFAULT NULL,
+
 FOREIGN KEY (rpv_user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-CONSTRAINT UQ_ResetPassVeriffication_User_Id UNIQUE (rpv_user_id),
-CONSTRAINT UQ_ResetPassVeriffication_Url UNIQUE (url)
+CONSTRAINT UQ_ResetPassVerification_User_Id UNIQUE (rpv_user_id),
+CONSTRAINT UQ_ResetPassVerification_Url UNIQUE (url)
 
 );
 
@@ -210,10 +209,9 @@ CREATE TABLE IF NOT EXISTS two_factor_verifications(
 tfv_id      BIGINT UNSIGNED   NOT NULL AUTO_INCREMENT PRIMARY KEY,
 tfv_user_id  BIGINT UNSIGNED   NOT NULL,
 code VARCHAR(255)  DEFAULT NULL,
-expirtatio_date DATETIME DEFAULT NULL,
---date DATETIME NOT NULL,
+expiration_date DATETIME DEFAULT NULL,
 FOREIGN KEY (tfv_user_id) REFERENCES users(user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-CONSTRAINT UQ_TwoFactorVeriffication_User_Id UNIQUE (tfv_user_id),
-CONSTRAINT UQ_TwoFactorVeriffication_Code UNIQUE (code)
+CONSTRAINT UQ_TwoFactorVerification_User_Id UNIQUE (tfv_user_id),
+CONSTRAINT UQ_TwoFactorVerification_Code UNIQUE (code)
 
 );

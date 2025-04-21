@@ -73,7 +73,7 @@ public class UserRepositoryImpl implements UserRepository<User> ,UserDetailsServ
             throw new ApiException("EmptyResultDataAccessException");
         }
         catch (Exception exception){
-            throw new ApiException("something else");
+            throw new ApiException(exception.getMessage());
         }
 
 
@@ -205,6 +205,18 @@ public class UserRepositoryImpl implements UserRepository<User> ,UserDetailsServ
         }
     }
 
+    @Override
+    public User getUserById(Long id) {
+
+        try{
+            System.out.println("id: " + id);
+          User user = jdbc.queryForObject(SELECT_USER_BY_ID_QUERY,Map.of("id",id),new UserRowMapper());
+            System.out.println("user: " + user);
+            return user;
+        }catch (EmptyResultDataAccessException exception){
+            throw new ApiException("Could not find record");
+    }}
+
     private boolean isVerificationCodeExpired(String code) {
         try {
             Date expDate = jdbc.queryForObject(SELECT_EXP_DATE, Map.of("code", code), Date.class);
@@ -213,9 +225,10 @@ public class UserRepositoryImpl implements UserRepository<User> ,UserDetailsServ
 
 
         }catch(EmptyResultDataAccessException exception){
-            throw new ApiException("Could not find record");}
+            throw new ApiException("Could not find record");
+        }
         catch(Exception e){
-            throw  new ApiException("An error is occurred.Please try again." + e.getMessage());
+            throw new ApiException("An error is occurred.Please try again." + e.getMessage());
         }
 
    return false;

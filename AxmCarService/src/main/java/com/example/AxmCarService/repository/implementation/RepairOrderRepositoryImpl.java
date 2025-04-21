@@ -15,6 +15,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -51,7 +52,10 @@ public class RepairOrderRepositoryImpl implements RepairOrderRepository<RepairOr
         } catch (Exception e) {
             throw new ApiException(e.getMessage());
         }
+        //this are for object that is returned ,not for object that is added to db
         repairOrder.setOrderId(Objects.requireNonNull(kh.getKey()).longValue());
+        repairOrder.setStatus("In Progress");
+        repairOrder.setDateReceived(new Date());
 
         return repairOrder;
     }
@@ -66,7 +70,7 @@ public class RepairOrderRepositoryImpl implements RepairOrderRepository<RepairOr
                 .addValue("vehicleId", repairOrder.getVehicleId())
                 .addValue("technicianId", repairOrder.getTechnicianId())
                 .addValue("description", repairOrder.getDescription())
-                .addValue("receivedDate", currentDateTime)
+                .addValue("receivedDate", new Date())
                 .addValue("diagnosis", repairOrder.getDiagnosis())
                 .addValue("status","In Progress")
                 .addValue("estimatedCompletionDate", estimatedDate )

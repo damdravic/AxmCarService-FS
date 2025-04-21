@@ -28,18 +28,20 @@ public class RepairOrderResource {
                         .httpStatus(OK)
                         .statusCode(OK.value())
                         .message("All repair orders fetched successfully")
-                        .data(Map.of("repairOrders", repairOrderService.getAll()))
+                        .data(Map.of("orders", repairOrderService.getAll()))
                         .build());
     }
     @RequestMapping("/create")
     public ResponseEntity<HttpResponse> create(@RequestBody RepairOrder order){
+        System.out.println(order);
+
           return ResponseEntity.ok().body(
                   HttpResponse.builder()
                             .timeStamp(now().toString())
                             .httpStatus(OK)
                             .statusCode(OK.value())
                             .message("RepairOrder created  successfully")
-                            .data(Map.of("repairOrder", repairOrderService.create(order)))
+                            .data(Map.of("order", repairOrderService.create(order)))
                             .build());
     }
 

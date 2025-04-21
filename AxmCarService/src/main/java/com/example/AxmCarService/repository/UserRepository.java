@@ -23,4 +23,6 @@ public interface UserRepository<T extends User> {
     User verifyCode(String email, String code);
 
     List<T> getAllUsers();
+
+    User getUserById(Long id);
 }

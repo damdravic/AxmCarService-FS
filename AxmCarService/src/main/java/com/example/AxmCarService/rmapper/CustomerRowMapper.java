@@ -16,8 +16,13 @@ public class CustomerRowMapper implements RowMapper<Customer> {
                 .email(rs.getString("customer_email"))
                 .phone(rs.getString("customer_phone"))
                 .notes(rs.getString("customer_notes"))
+                .active(rs.getBoolean("customer_active"))
                 .createdDate(rs.getDate("customer_created_date"))
+                .updateDate(rs.getDate("customer_updated_date"))
                 .createdBy(rs.getString("customer_created_by"))
+                .updatedBy(rs.getString("customer_updated_by"))
                 .build();
     }
+
+
 }

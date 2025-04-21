@@ -32,6 +32,8 @@ import static java.util.Arrays.stream;
 public class TokenProvider {
 
     public static final String AUTHORITIES = "authorities";
+
+    public static final String NAMES = "names";
     private static final long ACCESS_TOKEN_EXPIRATION_TIME = 300_000_000;
     private static final long REFRESH_TOKEN_EXPIRATION_TIME = 432_000_000;
     @Value(value = "${jwt.secret}")
@@ -40,11 +42,18 @@ public class TokenProvider {
 
     public String createAccessToken(UserPrincipal userPrincipal){
         String[] claims = getClaimsFromUser(userPrincipal);
+        String[] names = getNamesFromUser(userPrincipal);
         return JWT.create().withIssuer("ANAXIM").withAudience(" ")
                 .withIssuedAt(new Date()).withSubject(userPrincipal.getUsername())
-                .withArrayClaim(AUTHORITIES,claims).withExpiresAt(new Date(currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
+                .withArrayClaim(AUTHORITIES,claims)
+                .withArrayClaim(NAMES,names).withExpiresAt(new Date(currentTimeMillis() + ACCESS_TOKEN_EXPIRATION_TIME))
                 .sign(HMAC512(secret.getBytes()));
         
+    }
+
+    private String[] getNamesFromUser(UserPrincipal userPrincipal) {
+        return new String[]{userPrincipal.getUser().getFirstName(),
+                userPrincipal.getUser().getLastName()};
     }
 
 

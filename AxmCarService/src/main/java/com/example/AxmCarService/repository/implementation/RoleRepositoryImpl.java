@@ -54,6 +54,9 @@ public class RoleRepositoryImpl implements RoleRepository {
 
     @Override
     public void addRoleToUser(Long userId, String roleName) {
+
+        //TODO here for first time does not have role name in roles table  --fix this
+
         try{
             Role role = jdbc.queryForObject(SELECT_ROLE_BY_NAME_QUERY, of("roleName",roleName),new RoleRowMapper());
             jdbc.update(INSERT_ROLE_TO_USER_QUERY, of("userId",userId,"roleId",role.getRoleId()));

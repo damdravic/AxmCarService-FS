@@ -1,6 +1,7 @@
 package com.example.AxmCarService.repository.implementation;
 
 import com.example.AxmCarService.domain.Customer;
+import com.example.AxmCarService.domain.User;
 import com.example.AxmCarService.domain.UserPrincipal;
 import com.example.AxmCarService.dto.domainDTO.UserDTO;
 import com.example.AxmCarService.exception.ApiException;
@@ -23,10 +24,12 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
-import static com.example.AxmCarService.query.CustomerQuery.INSERT_CUSTOMER_QUERY;
-import static com.example.AxmCarService.query.CustomerQuery.SELECT_ALL_CUSTOMERS;
+
+import static com.example.AxmCarService.query.CustomerQuery.*;
 
 @Repository
 @Data
@@ -38,9 +41,7 @@ public class CustomerRepositoryImpl implements CustomerRepository {
     public final UserService userService;
 
 
-    public Customer getById(Long id) {
-        return null;
-    }
+
 
 
 
@@ -93,10 +94,51 @@ public class CustomerRepositoryImpl implements CustomerRepository {
 
 
     public void delete(Long id) {
+        jdbc.update(DELETE_CUSTOMER_BY_ID_QUERY, Map.of("customerId", id));
     }
 
     public List<Customer> getAll() {
-      List customers =   jdbc.query(SELECT_ALL_CUSTOMERS, new CustomerRowMapper());
+      List<Customer> customers =   jdbc.query(SELECT_ALL_CUSTOMERS, new CustomerRowMapper());
+
+      //get name of user by id in filed createdBy
+      customers.forEach(customer -> customer.setCreatedBy(getUserName(customer.getCreatedBy())));
+
+
         return customers;
+    }
+
+   //get name of user by id
+    private String getUserName(String userId){
+        System.out.println(userId);
+try{
+    System.out.println(userId);
+        Long userIdLong = Long.parseLong(userId);
+    System.out.println(userIdLong);
+
+        List<UserDTO> usersDTO = new ArrayList<>();
+        System.out.println("pass1");
+        for(UserDTO user : usersDTO){
+            if(user.getUserId().equals(userIdLong)){
+                return user.getFirstName();
+            }
+        }
+        System.out.println("pass2");
+
+        UserDTO userBD = userService.getUserById(userIdLong);
+        usersDTO.add(userBD);
+        System.out.println(userBD.toString());
+        return userBD.getFirstName();}
+catch (Exception e){
+    log.error("Error while getting user name " + e.getMessage());
+    return "User not found";
+}
+    }
+
+    public Customer getCustomerById(Long id) {
+        try{
+            return jdbc.queryForObject(SELECT_CUSTOMER_BY_ID_QUERY,Map.of("customerId",id),new CustomerRowMapper());
+        }catch (Exception e){
+            throw new ApiException("Customer not found");
+}
     }
 }
